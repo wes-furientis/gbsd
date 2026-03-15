@@ -1,39 +1,39 @@
 {
-  "name": "get-shit-done-cc",
+  "name": "@wes-furientis/gbsd",
   "version": "1.22.4",
-  "description": "A meta-prompting, context engineering and spec-driven development system for Claude Code, OpenCode, Gemini and Codex by TÂCHES.",
+  "description": "Go Build Something Dangerous - AI agent workflow framework with Pathfinder integration",
   "bin": {
-    "get-shit-done-cc": "bin/install.js"
+    "gbsd": "bin/install.js"
   },
   "files": [
     "bin",
     "commands",
-    "get-shit-done",
+    "gbsd",
     "agents",
     "hooks/dist",
     "scripts"
   ],
   "keywords": [
+    "gbsd",
+    "ai-agents",
+    "pathfinder",
+    "code-intelligence",
     "claude",
     "claude-code",
     "ai",
     "meta-prompting",
     "context-engineering",
-    "spec-driven-development",
-    "gemini",
-    "gemini-cli",
-    "codex",
-    "codex-cli"
+    "spec-driven-development"
   ],
   "author": "TÂCHES",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/glittercowboy/get-shit-done.git"
+    "url": "git+https://github.com/wes-furientis/gbsd.git"
   },
-  "homepage": "https://github.com/glittercowboy/get-shit-done",
+  "homepage": "https://github.com/wes-furientis/gbsd",
   "bugs": {
-    "url": "https://github.com/glittercowboy/get-shit-done/issues"
+    "url": "https://github.com/wes-furientis/gbsd/issues"
   },
   "engines": {
     "node": ">=16.7.0"
@@ -46,6 +46,6 @@
     "build:hooks": "node scripts/build-hooks.js",
     "prepublishOnly": "npm run build:hooks",
     "test": "node scripts/run-tests.cjs",
-    "test:coverage": "c8 --check-coverage --lines 70 --reporter text --include 'get-shit-done/bin/lib/*.cjs' --exclude 'tests/**' --all node scripts/run-tests.cjs"
+    "test:coverage": "c8 --check-coverage --lines 70 --reporter text --include 'gbsd/bin/lib/*.cjs' --exclude 'tests/**' --all node scripts/run-tests.cjs"
   }
 }

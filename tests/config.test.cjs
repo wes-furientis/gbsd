@@ -1,8 +1,8 @@
 /**
- * GSD Tools Tests - config.cjs
+ * GBSD Tools Tests - config.cjs
  *
  * CLI integration tests for config-ensure-section, config-set, and config-get
- * commands exercised through gsd-tools.cjs via execSync.
+ * commands exercised through gbsd-tools.cjs via execSync.
  *
  * Requirements: TEST-13
  */
@@ -12,7 +12,7 @@ const assert = require('node:assert');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
-const { runGsdTools, createTempProject, cleanup } = require('./helpers.cjs');
+const { runGbsdTools, createTempProject, cleanup } = require('./helpers.cjs');
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -40,14 +40,14 @@ describe('config-ensure-section command', () => {
   });
 
   test('creates config.json with expected structure and types', () => {
-    const result = runGsdTools('config-ensure-section', tmpDir);
+    const result = runGbsdTools('config-ensure-section', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
     assert.strictEqual(output.created, true);
 
     const config = readConfig(tmpDir);
-    // Verify structure and types — exact values may vary if ~/.gsd/defaults.json exists
+    // Verify structure and types — exact values may vary if ~/.gbsd/defaults.json exists
     assert.strictEqual(typeof config.model_profile, 'string');
     assert.strictEqual(typeof config.commit_docs, 'boolean');
     assert.strictEqual(typeof config.parallelization, 'boolean');
@@ -64,39 +64,39 @@ describe('config-ensure-section command', () => {
   });
 
   test('is idempotent — returns already_exists on second call', () => {
-    const first = runGsdTools('config-ensure-section', tmpDir);
+    const first = runGbsdTools('config-ensure-section', tmpDir);
     assert.ok(first.success, `First call failed: ${first.error}`);
     const firstOutput = JSON.parse(first.output);
     assert.strictEqual(firstOutput.created, true);
 
-    const second = runGsdTools('config-ensure-section', tmpDir);
+    const second = runGbsdTools('config-ensure-section', tmpDir);
     assert.ok(second.success, `Second call failed: ${second.error}`);
     const secondOutput = JSON.parse(second.output);
     assert.strictEqual(secondOutput.created, false);
     assert.strictEqual(secondOutput.reason, 'already_exists');
   });
 
-  // NOTE: This test touches ~/.gsd/ on the real filesystem. It uses save/restore
+  // NOTE: This test touches ~/.gbsd/ on the real filesystem. It uses save/restore
   // try/finally and skips if the file already exists to avoid corrupting user config.
   test('detects Brave Search from file-based key', () => {
     const homedir = os.homedir();
-    const gsdDir = path.join(homedir, '.gsd');
-    const braveKeyFile = path.join(gsdDir, 'brave_api_key');
+    const gbsdDir = path.join(homedir, '.gbsd');
+    const braveKeyFile = path.join(gbsdDir, 'brave_api_key');
 
     // Skip if file already exists (don't mess with user's real config)
     if (fs.existsSync(braveKeyFile)) {
       return;
     }
 
-    // Create .gsd dir and brave_api_key file
-    const gsdDirExisted = fs.existsSync(gsdDir);
+    // Create .gbsd dir and brave_api_key file
+    const gbsdDirExisted = fs.existsSync(gbsdDir);
     try {
-      if (!gsdDirExisted) {
-        fs.mkdirSync(gsdDir, { recursive: true });
+      if (!gbsdDirExisted) {
+        fs.mkdirSync(gbsdDir, { recursive: true });
       }
       fs.writeFileSync(braveKeyFile, 'test-key', 'utf-8');
 
-      const result = runGsdTools('config-ensure-section', tmpDir);
+      const result = runGbsdTools('config-ensure-section', tmpDir);
       assert.ok(result.success, `Command failed: ${result.error}`);
 
       const config = readConfig(tmpDir);
@@ -104,36 +104,36 @@ describe('config-ensure-section command', () => {
     } finally {
       // Clean up
       try { fs.unlinkSync(braveKeyFile); } catch { /* ignore */ }
-      if (!gsdDirExisted) {
-        try { fs.rmdirSync(gsdDir); } catch { /* ignore if not empty */ }
+      if (!gbsdDirExisted) {
+        try { fs.rmdirSync(gbsdDir); } catch { /* ignore if not empty */ }
       }
     }
   });
 
-  // NOTE: This test touches ~/.gsd/ on the real filesystem. It uses save/restore
+  // NOTE: This test touches ~/.gbsd/ on the real filesystem. It uses save/restore
   // try/finally and skips if the file already exists to avoid corrupting user config.
   test('merges user defaults from defaults.json', () => {
     const homedir = os.homedir();
-    const gsdDir = path.join(homedir, '.gsd');
-    const defaultsFile = path.join(gsdDir, 'defaults.json');
+    const gbsdDir = path.join(homedir, '.gbsd');
+    const defaultsFile = path.join(gbsdDir, 'defaults.json');
 
     // Save existing defaults if present
     let existingDefaults = null;
-    const gsdDirExisted = fs.existsSync(gsdDir);
+    const gbsdDirExisted = fs.existsSync(gbsdDir);
     if (fs.existsSync(defaultsFile)) {
       existingDefaults = fs.readFileSync(defaultsFile, 'utf-8');
     }
 
     try {
-      if (!gsdDirExisted) {
-        fs.mkdirSync(gsdDir, { recursive: true });
+      if (!gbsdDirExisted) {
+        fs.mkdirSync(gbsdDir, { recursive: true });
       }
       fs.writeFileSync(defaultsFile, JSON.stringify({
         model_profile: 'quality',
         commit_docs: false,
       }), 'utf-8');
 
-      const result = runGsdTools('config-ensure-section', tmpDir);
+      const result = runGbsdTools('config-ensure-section', tmpDir);
       assert.ok(result.success, `Command failed: ${result.error}`);
 
       const config = readConfig(tmpDir);
@@ -147,34 +147,34 @@ describe('config-ensure-section command', () => {
       } else {
         try { fs.unlinkSync(defaultsFile); } catch { /* ignore */ }
       }
-      if (!gsdDirExisted) {
-        try { fs.rmdirSync(gsdDir); } catch { /* ignore */ }
+      if (!gbsdDirExisted) {
+        try { fs.rmdirSync(gbsdDir); } catch { /* ignore */ }
       }
     }
   });
 
-  // NOTE: This test touches ~/.gsd/ on the real filesystem. It uses save/restore
+  // NOTE: This test touches ~/.gbsd/ on the real filesystem. It uses save/restore
   // try/finally and skips if the file already exists to avoid corrupting user config.
   test('merges nested workflow keys from defaults.json preserving unset keys', () => {
     const homedir = os.homedir();
-    const gsdDir = path.join(homedir, '.gsd');
-    const defaultsFile = path.join(gsdDir, 'defaults.json');
+    const gbsdDir = path.join(homedir, '.gbsd');
+    const defaultsFile = path.join(gbsdDir, 'defaults.json');
 
     let existingDefaults = null;
-    const gsdDirExisted = fs.existsSync(gsdDir);
+    const gbsdDirExisted = fs.existsSync(gbsdDir);
     if (fs.existsSync(defaultsFile)) {
       existingDefaults = fs.readFileSync(defaultsFile, 'utf-8');
     }
 
     try {
-      if (!gsdDirExisted) {
-        fs.mkdirSync(gsdDir, { recursive: true });
+      if (!gbsdDirExisted) {
+        fs.mkdirSync(gbsdDir, { recursive: true });
       }
       fs.writeFileSync(defaultsFile, JSON.stringify({
         workflow: { research: false },
       }), 'utf-8');
 
-      const result = runGsdTools('config-ensure-section', tmpDir);
+      const result = runGbsdTools('config-ensure-section', tmpDir);
       assert.ok(result.success, `Command failed: ${result.error}`);
 
       const config = readConfig(tmpDir);
@@ -187,8 +187,8 @@ describe('config-ensure-section command', () => {
       } else {
         try { fs.unlinkSync(defaultsFile); } catch { /* ignore */ }
       }
-      if (!gsdDirExisted) {
-        try { fs.rmdirSync(gsdDir); } catch { /* ignore */ }
+      if (!gbsdDirExisted) {
+        try { fs.rmdirSync(gbsdDir); } catch { /* ignore */ }
       }
     }
   });
@@ -202,7 +202,7 @@ describe('config-set command', () => {
   beforeEach(() => {
     tmpDir = createTempProject();
     // Create initial config
-    runGsdTools('config-ensure-section', tmpDir);
+    runGbsdTools('config-ensure-section', tmpDir);
   });
 
   afterEach(() => {
@@ -210,7 +210,7 @@ describe('config-set command', () => {
   });
 
   test('sets a top-level string value', () => {
-    const result = runGsdTools('config-set model_profile quality', tmpDir);
+    const result = runGbsdTools('config-set model_profile quality', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -223,7 +223,7 @@ describe('config-set command', () => {
   });
 
   test('coerces true to boolean', () => {
-    const result = runGsdTools('config-set commit_docs true', tmpDir);
+    const result = runGbsdTools('config-set commit_docs true', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const config = readConfig(tmpDir);
@@ -232,7 +232,7 @@ describe('config-set command', () => {
   });
 
   test('coerces false to boolean', () => {
-    const result = runGsdTools('config-set commit_docs false', tmpDir);
+    const result = runGbsdTools('config-set commit_docs false', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const config = readConfig(tmpDir);
@@ -241,7 +241,7 @@ describe('config-set command', () => {
   });
 
   test('coerces numeric strings to numbers', () => {
-    const result = runGsdTools('config-set granularity 42', tmpDir);
+    const result = runGbsdTools('config-set granularity 42', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const config = readConfig(tmpDir);
@@ -250,7 +250,7 @@ describe('config-set command', () => {
   });
 
   test('preserves plain strings', () => {
-    const result = runGsdTools('config-set model_profile hello', tmpDir);
+    const result = runGbsdTools('config-set model_profile hello', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const config = readConfig(tmpDir);
@@ -259,7 +259,7 @@ describe('config-set command', () => {
   });
 
   test('sets nested values via dot-notation', () => {
-    const result = runGsdTools('config-set workflow.research false', tmpDir);
+    const result = runGbsdTools('config-set workflow.research false', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const config = readConfig(tmpDir);
@@ -270,7 +270,7 @@ describe('config-set command', () => {
     // Start with empty config
     writeConfig(tmpDir, {});
 
-    const result = runGsdTools('config-set workflow.research false', tmpDir);
+    const result = runGbsdTools('config-set workflow.research false', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const config = readConfig(tmpDir);
@@ -279,7 +279,7 @@ describe('config-set command', () => {
   });
 
   test('rejects unknown config keys', () => {
-    const result = runGsdTools('config-set workflow.nyquist_validation_enabled false', tmpDir);
+    const result = runGbsdTools('config-set workflow.nyquist_validation_enabled false', tmpDir);
     assert.strictEqual(result.success, false);
     assert.ok(
       result.error.includes('Unknown config key'),
@@ -288,7 +288,7 @@ describe('config-set command', () => {
   });
 
   test('errors when no key path provided', () => {
-    const result = runGsdTools('config-set', tmpDir);
+    const result = runGbsdTools('config-set', tmpDir);
     assert.strictEqual(result.success, false);
   });
 });
@@ -301,7 +301,7 @@ describe('config-get command', () => {
   beforeEach(() => {
     tmpDir = createTempProject();
     // Create config with known values
-    runGsdTools('config-ensure-section', tmpDir);
+    runGbsdTools('config-ensure-section', tmpDir);
   });
 
   afterEach(() => {
@@ -309,7 +309,7 @@ describe('config-get command', () => {
   });
 
   test('gets a top-level value', () => {
-    const result = runGsdTools('config-get model_profile', tmpDir);
+    const result = runGbsdTools('config-get model_profile', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -317,7 +317,7 @@ describe('config-get command', () => {
   });
 
   test('gets a nested value via dot-notation', () => {
-    const result = runGsdTools('config-get workflow.research', tmpDir);
+    const result = runGbsdTools('config-get workflow.research', tmpDir);
     assert.ok(result.success, `Command failed: ${result.error}`);
 
     const output = JSON.parse(result.output);
@@ -325,7 +325,7 @@ describe('config-get command', () => {
   });
 
   test('errors for nonexistent key', () => {
-    const result = runGsdTools('config-get nonexistent_key', tmpDir);
+    const result = runGbsdTools('config-get nonexistent_key', tmpDir);
     assert.strictEqual(result.success, false);
     assert.ok(
       result.error.includes('Key not found'),
@@ -334,7 +334,7 @@ describe('config-get command', () => {
   });
 
   test('errors for deeply nested nonexistent key', () => {
-    const result = runGsdTools('config-get workflow.nonexistent', tmpDir);
+    const result = runGbsdTools('config-get workflow.nonexistent', tmpDir);
     assert.strictEqual(result.success, false);
     assert.ok(
       result.error.includes('Key not found'),
@@ -345,7 +345,7 @@ describe('config-get command', () => {
   test('errors when config.json does not exist', () => {
     const emptyTmpDir = createTempProject();
     try {
-      const result = runGsdTools('config-get model_profile', emptyTmpDir);
+      const result = runGbsdTools('config-get model_profile', emptyTmpDir);
       assert.strictEqual(result.success, false);
       assert.ok(
         result.error.includes('No config.json'),
@@ -357,7 +357,7 @@ describe('config-get command', () => {
   });
 
   test('errors when no key path provided', () => {
-    const result = runGsdTools('config-get', tmpDir);
+    const result = runGbsdTools('config-get', tmpDir);
     assert.strictEqual(result.success, false);
   });
 });

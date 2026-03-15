@@ -1,5 +1,5 @@
 /**
- * GSD Agent Frontmatter Tests
+ * GBSD Agent Frontmatter Tests
  *
  * Validates that all agent .md files have correct frontmatter fields:
  * - Anti-heredoc instruction present in file-writing agents
@@ -14,11 +14,11 @@ const fs = require('fs');
 const path = require('path');
 
 const AGENTS_DIR = path.join(__dirname, '..', 'agents');
-const WORKFLOWS_DIR = path.join(__dirname, '..', 'get-shit-done', 'workflows');
-const COMMANDS_DIR = path.join(__dirname, '..', 'commands', 'gsd');
+const WORKFLOWS_DIR = path.join(__dirname, '..', 'gbsd', 'workflows');
+const COMMANDS_DIR = path.join(__dirname, '..', 'commands', 'gbsd');
 
 const ALL_AGENTS = fs.readdirSync(AGENTS_DIR)
-  .filter(f => f.startsWith('gsd-') && f.endsWith('.md'))
+  .filter(f => f.startsWith('gbsd-') && f.endsWith('.md'))
   .map(f => f.replace('.md', ''));
 
 const FILE_WRITING_AGENTS = ALL_AGENTS.filter(name => {
@@ -78,10 +78,10 @@ describe('SKILL: skills frontmatter', () => {
     for (const agent of ALL_AGENTS) {
       const content = fs.readFileSync(path.join(AGENTS_DIR, agent + '.md'), 'utf-8');
       const frontmatter = content.split('---')[1] || '';
-      const skillLines = frontmatter.split('\n').filter(l => l.trim().startsWith('- gsd-'));
+      const skillLines = frontmatter.split('\n').filter(l => l.trim().startsWith('- gbsd-'));
       for (const line of skillLines) {
         const skillName = line.trim().replace('- ', '');
-        assert.match(skillName, /^gsd-[\w-]+-workflow$/, `Invalid skill name: ${skillName}`);
+        assert.match(skillName, /^gbsd-[\w-]+-workflow$/, `Invalid skill name: ${skillName}`);
       }
     }
   });
@@ -121,7 +121,7 @@ describe('SPAWN: spawn type consistency', () => {
       const files = fs.readdirSync(dir).filter(f => f.endsWith('.md'));
       for (const file of files) {
         const content = fs.readFileSync(path.join(dir, file), 'utf-8');
-        const hasWorkaround = content.includes('First, read ~/.claude/agents/gsd-');
+        const hasWorkaround = content.includes('First, read ~/.claude/agents/gbsd-');
         assert.ok(
           !hasWorkaround,
           `${file} still has "First, read agent .md" workaround — use named subagent_type instead`
@@ -154,13 +154,13 @@ describe('SPAWN: spawn type consistency', () => {
     }
   });
 
-  test('diagnose-issues uses gsd-debugger (not general-purpose)', () => {
+  test('diagnose-issues uses gbsd-debugger (not general-purpose)', () => {
     const content = fs.readFileSync(
       path.join(WORKFLOWS_DIR, 'diagnose-issues.md'), 'utf-8'
     );
     assert.ok(
-      content.includes('subagent_type="gsd-debugger"'),
-      'diagnose-issues should spawn gsd-debugger, not general-purpose'
+      content.includes('subagent_type="gbsd-debugger"'),
+      'diagnose-issues should spawn gbsd-debugger, not general-purpose'
     );
   });
 });
