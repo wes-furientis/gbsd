@@ -4,6 +4,26 @@ Research how to implement a phase. Spawns gbsd-phase-researcher with phase conte
 Standalone research command. For most workflows, use `/gbsd:plan-phase` which integrates research automatically.
 </purpose>
 
+<pathfinder_navigation>
+## Pathfinder Navigation (when .code-intel/ exists)
+
+Check if Pathfinder index is available:
+```bash
+ls .code-intel/INDEX.md 2>/dev/null && echo "PATHFINDER_AVAILABLE=true" || echo "PATHFINDER_AVAILABLE=false"
+```
+
+**If PATHFINDER_AVAILABLE=false:** Skip this section entirely. Use standard glob/grep exploration.
+
+**If PATHFINDER_AVAILABLE=true:**
+- If any pathfinder command shows a stale index warning, run `pathfinder generate .` first
+- Read `.code-intel/INDEX.md` for codebase context
+- Use `pathfinder deps <entity>` to understand dependencies of modules relevant to the phase
+- Use `pathfinder query "<question>"` for semantic questions about the codebase
+- Read `interfaces/<module>.yaml` files for API surfaces of relevant modules
+- Use `pathfinder path <from> <to>` to understand how components connect
+- This replaces manual grep/glob exploration for understanding codebase structure
+</pathfinder_navigation>
+
 <process>
 
 ## Step 0: Resolve Model Profile

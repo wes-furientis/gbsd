@@ -8,6 +8,25 @@ Read all files referenced by the invoking prompt's execution_context before star
 @~/.claude/gbsd/references/ui-brand.md
 </required_reading>
 
+<pathfinder_navigation>
+## Pathfinder Navigation (when .code-intel/ exists)
+
+Check if Pathfinder index is available:
+```bash
+ls .code-intel/INDEX.md 2>/dev/null && echo "PATHFINDER_AVAILABLE=true" || echo "PATHFINDER_AVAILABLE=false"
+```
+
+**If PATHFINDER_AVAILABLE=false:** Skip this section entirely. Use standard glob/grep exploration.
+
+**If PATHFINDER_AVAILABLE=true:**
+- If any pathfinder command shows a stale index warning, run `pathfinder generate .` first
+- Use `pathfinder blast-radius <entity>` when assigning `files_modified` in plan frontmatter
+- Use `pathfinder deps <entity>` to understand task dependencies and ordering
+- Read `dependency_graph.yaml` for module-level dependency structure
+- Use blast-radius analysis to ensure plans account for all affected files
+- This improves accuracy of files_modified lists and wave dependency ordering
+</pathfinder_navigation>
+
 <process>
 
 ## 1. Initialize

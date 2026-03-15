@@ -20,6 +20,26 @@ Include enough detail to be useful as reference. Prioritize practical examples (
 Documents are reference material for Claude when planning/executing. Always include actual file paths formatted with backticks: `src/services/user.ts`.
 </philosophy>
 
+<pathfinder_navigation>
+## Pathfinder Navigation (when .code-intel/ exists)
+
+Check if Pathfinder index is available:
+```bash
+ls .code-intel/INDEX.md 2>/dev/null && echo "PATHFINDER_AVAILABLE=true" || echo "PATHFINDER_AVAILABLE=false"
+```
+
+**If PATHFINDER_AVAILABLE=false:** Skip this section entirely. Use standard glob/grep exploration.
+
+**If PATHFINDER_AVAILABLE=true:**
+- If any pathfinder command shows a stale index warning, run `pathfinder generate .` first
+- Read `.code-intel/INDEX.md` for codebase orientation BEFORE scanning directories
+- Read `.code-intel/module_map.yaml` for module responsibilities and key exports
+- Read `.code-intel/document_map.yaml` for documentation landscape
+- Use `pathfinder rank` to identify the most important modules
+- Use `pathfinder deps <module>` to understand module relationships
+- Use this information to produce codebase map documents instead of manually scanning the file tree
+</pathfinder_navigation>
+
 <process>
 
 <step name="init_context" priority="first">

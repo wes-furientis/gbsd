@@ -9,6 +9,25 @@ Read config.json for planning behavior settings.
 @~/.claude/gbsd/references/git-integration.md
 </required_reading>
 
+<pathfinder_navigation>
+## Pathfinder Navigation (when .code-intel/ exists)
+
+Check if Pathfinder index is available:
+```bash
+ls .code-intel/INDEX.md 2>/dev/null && echo "PATHFINDER_AVAILABLE=true" || echo "PATHFINDER_AVAILABLE=false"
+```
+
+**If PATHFINDER_AVAILABLE=false:** Skip this section entirely. Use standard glob/grep exploration.
+
+**If PATHFINDER_AVAILABLE=true:**
+- If any pathfinder command shows a stale index warning, run `pathfinder generate .` first
+- Use `pathfinder deps <entity>` for file discovery instead of globbing/grepping
+- Read `interfaces/<module>.yaml` before modifying a module to understand its API surface
+- Use `pathfinder path <from> <to>` to understand how your changes connect to other modules
+- Use `pathfinder query "<question>"` for semantic questions during implementation
+- Fall back to glob/grep only for: string literal search, regex patterns, content not in the index
+</pathfinder_navigation>
+
 <process>
 
 <step name="init_context" priority="first">
